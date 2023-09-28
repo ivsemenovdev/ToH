@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 
 import { Observable, of } from 'rxjs';
 
-import { Hero } from './hero';
+import { ManInterface } from './manInterface';
 import { HEROES } from './mock-heroes';
 import { MessageService } from './message.service';
 
@@ -30,20 +30,20 @@ export class HeroService {
   private heroesUrl = 'api/heroes';  // URL to web api
 
   /** GET heroes from the server */
-  getHeroes(): Observable<Hero[]> {
-    return this.http.get<Hero[]>(this.heroesUrl)
+  getHeroes(): Observable<ManInterface[]> {
+    return this.http.get<ManInterface[]>(this.heroesUrl)
       .pipe(
         tap(_ => this.log('fetched heroes')),
-        catchError(this.handleError<Hero[]>('getHeroes', []))
+        catchError(this.handleError<ManInterface[]>('getHeroes', []))
       );
   }
 
   /** GET hero by id. Will 404 if id not found */
-  getHero(id: number): Observable<Hero> {
+  getHero(id: number): Observable<ManInterface> {
     const url = `${this.heroesUrl}/${id}`;
-    return this.http.get<Hero>(url).pipe(
+    return this.http.get<ManInterface>(url).pipe(
       tap(_ => this.log(`fetched hero id=${id}`)),
-      catchError(this.handleError<Hero>(`getHero id=${id}`))
+      catchError(this.handleError<ManInterface>(`getHero id=${id}`))
     );
   }
 
@@ -69,7 +69,7 @@ export class HeroService {
   }
 
   /** PUT: update the hero on the server */
-  updateHero(hero: Hero): Observable<any> {
+  updateHero(hero: ManInterface): Observable<any> {
     return this.http.put(this.heroesUrl, hero, this.httpOptions).pipe(
       tap(_ => this.log(`updated hero id=${hero.id}`)),
       catchError(this.handleError<any>('updateHero'))
@@ -77,34 +77,34 @@ export class HeroService {
   }
 
   /** POST: add a new hero to the server */
-  addHero(hero: Hero): Observable<Hero> {
-    return this.http.post<Hero>(this.heroesUrl, hero, this.httpOptions).pipe(
-      tap((newHero: Hero) => this.log(`added hero w/ id=${newHero.id}`)),
-      catchError(this.handleError<Hero>('addHero'))
+  addHero(hero: ManInterface): Observable<ManInterface> {
+    return this.http.post<ManInterface>(this.heroesUrl, hero, this.httpOptions).pipe(
+      tap((newHero: ManInterface) => this.log(`added hero w/ id=${newHero.id}`)),
+      catchError(this.handleError<ManInterface>('addHero'))
     );
   }
 
   /** DELETE: delete the hero from the server */
-  deleteHero(id: number): Observable<Hero> {
+  deleteHero(id: number): Observable<ManInterface> {
     const url = `${this.heroesUrl}/${id}`;
 
-    return this.http.delete<Hero>(url, this.httpOptions).pipe(
+    return this.http.delete<ManInterface>(url, this.httpOptions).pipe(
       tap(_ => this.log(`deleted hero id=${id}`)),
-      catchError(this.handleError<Hero>('deleteHero'))
+      catchError(this.handleError<ManInterface>('deleteHero'))
     );
   }
 
   /** GET heroes whose name contains search term **/
-  searchHeroes(term: string): Observable<Hero[]> {
+  searchHeroes(term: string): Observable<ManInterface[]> {
     if (!term.trim()) {
       // if not search term, return empty hero array.
       return of([]);
     }
-    return this.http.get<Hero[]>(`${this.heroesUrl}/?name=${term}`).pipe(
+    return this.http.get<ManInterface[]>(`${this.heroesUrl}/?name=${term}`).pipe(
       tap(x => x.length ?
         this.log(`found heroes matching "${term}"`) :
         this.log(`no heroes matching "${term}"`)),
-      catchError(this.handleError<Hero[]>('searchHeroes', []))
+      catchError(this.handleError<ManInterface[]>('searchHeroes', []))
     );
   }
 }

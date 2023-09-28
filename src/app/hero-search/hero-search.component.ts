@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 
 import { Observable, Subject } from 'rxjs';
 
@@ -6,7 +6,7 @@ import {
   debounceTime, distinctUntilChanged, switchMap
 } from 'rxjs/operators';
 
-import { Hero } from '../hero';
+import { ManInterface } from '../manInterface';
 import { HeroService } from '../hero.service';
 
 @Component({
@@ -15,8 +15,10 @@ import { HeroService } from '../hero.service';
   styleUrls: [ './hero-search.component.css' ]
 })
 export class HeroSearchComponent implements OnInit {
-  heroes$!: Observable<Hero[]>;
+  heroes$!: Observable<ManInterface[]>;
   private searchTerms = new Subject<string>();
+
+  @Output() clicked = new EventEmitter<MouseEvent>();
 
   constructor(private heroService: HeroService) {}
 
@@ -36,5 +38,9 @@ export class HeroSearchComponent implements OnInit {
       // switch to new search observable each time the term changes
       switchMap((term: string) => this.heroService.searchHeroes(term)),
     );
+  }
+
+  onClick(event: MouseEvent) {
+    this.clicked.emit(event)
   }
 }
