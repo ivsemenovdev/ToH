@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {DataService} from "./services/data.service";
-import {map, Subject, tap} from "rxjs";
+import {from, map, pipe, Subject, tap} from "rxjs";
 import {ConvertService} from "./services/convert.service";
 import {logMessages} from "@angular-devkit/build-angular/src/tools/esbuild/utils";
 
@@ -11,30 +11,42 @@ import {logMessages} from "@angular-devkit/build-angular/src/tools/esbuild/utils
 })
 export class AppComponent implements OnInit {
 
-  observable$ = this.dataService.get();
-
   title = 'Learning';
+
+  subject = this.dataService.subject;
+  observable$ = this.dataService.observable$;
+
   obj: { [index: string]: string } = {}
-  res: Array<{[index: string]: string}> = [];
-  isClicked = false
+  res: Array<{ [index: string]: string }> = [];
 
-  constructor(private dataService: DataService, private convertService: ConvertService) {
-  }
+  ngOnInit(): void {
 
-  ngOnInit() {
+    //подписчики
+    // this.subject.subscribe(val => {
+    //   console.log("A", val)
+    // })
+    //
+    // this.subject.subscribe(val => {
+    //   console.log("B", val)
+    // })
+
+    this.subject.subscribe(val => {
+      this.res.push(this.obj);
+    })
+
     this.observable$
       .pipe(
-        tap(_ => console.log("stream el", _)),
+        tap(_ => console.log("stream el1", _)),
         map(value => {
+          this.obj = {}
           this.obj[value] = this.convertService.getRandomChar()
           return this.obj
         }))
-      .subscribe(val => {
-        this.res.push(this.obj);
-        this.obj = {}
-        console.log("piped el", val)
-      })
-    console.log(this.res)
+      // @ts-ignore
+      .subscribe(this.subject); // You can subscribe providing a Subject
+  }
+
+  constructor(private dataService: DataService, private convertService: ConvertService) {
   }
 
   addElement() {
@@ -42,14 +54,13 @@ export class AppComponent implements OnInit {
     this.res = [];
     this.observable$
       .pipe(
-        tap(_ => console.log("stream el", _)),
         map(value => {
+          this.obj = {}
           this.obj[value] = this.convertService.getRandomChar()
           return this.obj
         }))
       .subscribe(val => {
         this.res.push(this.obj);
-        this.obj = {}
         console.log("piped el", val)
       })
     console.log(this.res)
@@ -59,7 +70,6 @@ export class AppComponent implements OnInit {
     return 0
   }
 
-  // log(event) {
   clickHandler(el: any, key: any) {
     console.log(el.value[key])
   }
