@@ -8,6 +8,12 @@
   ...добавлять в subject
   arr = [1,2,3,4,5];
 </div>
-<!--<button (click)="addElement()">Add Element</button>-->
+<div class="buttons">
+<div *ngFor="let el of res | keyvalue : returnZero">
+  <button (click)="clickHandler(el, Object.keys(el.value))">{{Object.keys(el.value)}}</button>
+</div>
+</div>
+
+<button (click)="addElement()">Add Element</button>
 <!--<app-parent></app-parent>-->
 <!--<app-child></app-child>-->
