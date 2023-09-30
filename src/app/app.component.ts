@@ -30,16 +30,15 @@ export class AppComponent implements OnInit {
     //   console.log("B", val)
     // })
 
-    this.subject.subscribe(val => {
-      this.res.push(this.obj);
-    })
+    this.subject.subscribe(val => {})
 
     this.observable$
       .pipe(
-        tap(_ => console.log("stream el1", _)),
+        // tap(_ => console.log("stream el1", _)),
         map(value => {
           this.obj = {}
           this.obj[value] = this.convertService.getRandomChar()
+          this.res.push(this.obj);
           return this.obj
         }))
       // @ts-ignore
@@ -61,7 +60,6 @@ export class AppComponent implements OnInit {
         }))
       .subscribe(val => {
         this.res.push(this.obj);
-        console.log("piped el", val)
       })
     console.log(this.res)
   }
