@@ -1,76 +1,82 @@
-import {Component, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
 import {DataService} from "./services/data.service";
-import {from, map, pipe, Subject, tap} from "rxjs";
+import {map, take, tap} from "rxjs";
 import {ConvertService} from "./services/convert.service";
-import {logMessages} from "@angular-devkit/build-angular/src/tools/esbuild/utils";
+
+interface Item {
+  id: number,
+  value: string
+}
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent implements OnInit {
 
   title = 'Learning';
 
-  subject = this.dataService.subject;
-  observable$ = this.dataService.observable$;
+  subject$ = this.dataService.subject$;
 
-  obj: { [index: string]: string } = {}
-  res: Array<{ [index: string]: string }> = [];
-
-  ngOnInit(): void {
-
-    //подписчики
-    // this.subject.subscribe(val => {
-    //   console.log("A", val)
-    // })
-    //
-    // this.subject.subscribe(val => {
-    //   console.log("B", val)
-    // })
-
-    this.subject.subscribe(val => {})
-
-    this.observable$
-      .pipe(
-        // tap(_ => console.log("stream el1", _)),
-        map(value => {
-          this.obj = {}
-          this.obj[value] = this.convertService.getRandomChar()
-          this.res.push(this.obj);
-          return this.obj
-        }))
-      // @ts-ignore
-      .subscribe(this.subject); // You can subscribe providing a Subject
-  }
+  obj: Item = {"id": 0, "value": ''};
+  res: Array<Item> = [];
 
   constructor(private dataService: DataService, private convertService: ConvertService) {
   }
 
-  addElement() {
-    this.dataService.set();
-    this.res = [];
-    this.observable$
+  ngOnInit(): void {
+
+    this.subject$
       .pipe(
+        tap(_ => console.log("stream el1", _)),
         map(value => {
-          this.obj = {}
-          this.obj[value] = this.convertService.getRandomChar()
-          return this.obj
-        }))
+          this.convertArrayToArrayOfObject(value);
+          return this.res
+        }),
+      )
       .subscribe(val => {
-        this.res.push(this.obj);
+        console.log("A", val)
       })
-    console.log(this.res)
   }
 
-  returnZero() {
-    return 0
+  pushData(val: number) {
+    this.dataService.updateSubjectData(val);
   }
 
-  clickHandler(el: any, key: any) {
-    console.log(el.value[key])
+  convertArrayToArrayOfObject(arr: Array<number>) {
+    if (this.res.length === 0) {
+      for (let i = 0; i < arr.length; i++) {
+        this.obj = {"id": 0, "value": ''}
+        this.obj.id = arr[i];
+        this.obj.value = this.convertService.getRandomChar();
+        this.res.push(this.obj);
+      }
+    } else {
+      this.obj = {"id": 0, "value": ''}
+      console.log(arr)
+      this.obj.id = arr[arr.length - 1];
+      this.obj.value = this.convertService.getRandomChar();
+      this.res.push(this.obj);
+    }
   }
 
-  protected readonly Object = Object;
+  clickHandler(elValue: string) {
+    console.log(elValue);
+  }
+
+  addElement() {
+    if (this.res.length === 0) {
+      this.pushData(0);
+    } else {
+      this.pushData(this.res[this.res.length - 1].id + 1)
+    }
+  }
+
+  identify(i: number)  {
+    console.log(i)
+    return i;
+    }
+
 }
