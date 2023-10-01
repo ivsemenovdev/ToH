@@ -7,23 +7,28 @@
   Отдельной кнопкой создавать кнопку с рандомной буквой, номер по порядку возрастанию
   ...добавлять в subject
   arr = [1,2,3,4,5];
-<!--  Заменил
-    {
-    "key": "1",
-    "value": {
-        "2": "l"
-    }
-    на
-    {
-      "id": 2,
-      "value": "l"
-    }
-}-->
-</div>
-<div class="buttons">
-  <div *ngFor="let el of res; trackBy: identify" >
-    <button (click)="clickHandler(el.value)">{{el.id}}</button>
-  </div>
-</div>
+  <!--  Заменил
+      {
+      "key": "1",
+      "value": {
+          "2": "l"
+      }
+      на
+      {
+        "id": 2,
+        "value": "l"
+      }
+  }-->
+<h2>App component</h2>
 
-<button (click)="addElement()">Add Element</button>
+<ul>
+  <li>
+    <a routerLink="parent">Parent Component</a>
+  </li>
+  <li>
+    <a routerLink="child">Child Component</a>
+  </li>
+</ul>
+<router-outlet></router-outlet>
+
+</div>
