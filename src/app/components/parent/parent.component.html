@@ -1,6 +1,6 @@
 <p>parent works!</p>
 <div class="buttons">
-  <div *ngFor="let el of res; trackBy: identify" >
+  <div *ngFor="let el of getValue(); trackBy: identify" >
     <button (click)="clickHandler(el.value)">{{el.id}}</button>
   </div>
 </div>

@@ -1,7 +1,6 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnChanges, OnInit, SimpleChanges} from '@angular/core';
 import {DataService} from "../../services/data.service";
 import {ConvertService} from "../../services/convert.service";
-import {map, Observable, Subscription, tap} from "rxjs";
 
 interface Item {
   id: number,
@@ -11,41 +10,31 @@ interface Item {
 @Component({
   selector: 'app-parent',
   templateUrl: './parent.component.html',
-  styleUrls: ['./parent.component.css']
+  styleUrls: ['./parent.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ParentComponent implements OnInit, OnDestroy {
+export class ParentComponent implements OnInit{
 
-  arrayStream$ = this.dataService.subject$;
-  subscription: Subscription = new Subscription;
-
+  streamValue: number[] = []
   obj: Item = {"id": 0, "value": ''};
   res: Array<Item> = [];
 
   constructor(private dataService: DataService, private convertService: ConvertService) {
   }
 
-  ngOnInit(){
-
-    this.subscription = this.arrayStream$
-      .pipe(
-        tap(_ => console.log("stream el1", _)),
-        map(value => {
-          this.convertArrayToArrayOfObject(value);
-          return this.res
-        }),
-      )
-      .subscribe(val => {
-        console.log("A", val)
-      })
-
-  }
-
-  ngOnDestroy() {
-    this.subscription.unsubscribe();
+  ngOnInit() {
+    this.streamValue = this.dataService.streamValue;
+    this.convertArrayToArrayOfObject(this.streamValue);
   }
 
   pushData(val: number) {
     this.dataService.updateSubjectData = val;
+    this.streamValue = this.dataService.streamValue;
+    this.convertArrayToArrayOfObject(this.streamValue);
+  }
+
+  getValue() {
+    return this.res
   }
 
   convertArrayToArrayOfObject(arr: Array<number>) {
@@ -72,6 +61,7 @@ export class ParentComponent implements OnInit, OnDestroy {
     if (this.res.length === 0) {
       this.pushData(0);
     } else {
+      console.log(this.res[this.res.length - 1].id + 1)
       this.pushData(this.res[this.res.length - 1].id + 1)
     }
   }
@@ -79,6 +69,5 @@ export class ParentComponent implements OnInit, OnDestroy {
   identify(i: number)  {
     return i;
   }
-
 
 }
