@@ -1,7 +1,10 @@
+<!--<ng-container *ngIf="(inputArray$ | async) && (buttonsArray$ | async)">-->
 <div class="buttons">
-  <div *ngFor="let button of buttonsArray$ | async; trackBy: identify" >
+  <div *ngFor="let button of buttonsArray$ | async as buttonArray; trackBy: identify" >
+    <code>{{buttonArray | json}}</code>
     <button (click)="onButtonClick(button)">{{button.id}}</button>
   </div>
 </div>
 
 <button (click)="onAddButtonClick()">Add Element</button>
+<!--</ng-container>-->

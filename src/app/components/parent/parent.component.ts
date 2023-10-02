@@ -28,16 +28,16 @@ export class Item implements ItemInterface {
 export class ParentComponent implements OnInit {
 
   private _buttonsArraySubject = new BehaviorSubject<ItemInterface[]>([]);
-
   private dataService = inject(DataService)
   private convertService = inject(ConvertService)
+  private destroyRef = inject(DestroyRef);
 
   readonly buttonsArray$ = this._buttonsArraySubject.asObservable();
-  private destroyRef = inject(DestroyRef);
+  inputArray$ = this.dataService.inputArray$;
 
   ngOnInit() {
 
-    this.dataService.inputArray$
+    this.inputArray$
       .pipe(
         tap(value => this.convertArrayToArrayOfObject(value)),
         takeUntilDestroyed(this.destroyRef)
