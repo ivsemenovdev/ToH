@@ -1,8 +1,7 @@
-<p>parent works!</p>
 <div class="buttons">
-  <div *ngFor="let el of res; trackBy: identify" >
-    <button (click)="clickHandler(el.value)">{{el.id}}</button>
+  <div *ngFor="let button of buttonsArray$ | async; trackBy: identify" >
+    <button (click)="onButtonClick(button)">{{button.id}}</button>
   </div>
 </div>
 
-<button (click)="addElement()">Add Element</button>
+<button (click)="onAddButtonClick()">Add Element</button>

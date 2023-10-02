@@ -5,13 +5,13 @@ import {Injectable} from '@angular/core';
 })
 export class ConvertService {
 
-  s = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+  charItems = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-  private getRandomNumber() {
-    return Math.floor(Math.random() * (this.s.length - 1))
+  private getRandomNumber(charItems: string): number {
+    return Math.floor(Math.random() * (charItems?.length - 1))
   }
 
-  getRandomChar() {
-    return this.s[this.getRandomNumber()]
+  get randomChar(): string {
+    return this.charItems[this.getRandomNumber(this.charItems)]
   }
 }

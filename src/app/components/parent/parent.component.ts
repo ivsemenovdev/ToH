@@ -1,11 +1,22 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, DestroyRef, inject, OnDestroy, OnInit} from '@angular/core';
 import {DataService} from "../../services/data.service";
 import {ConvertService} from "../../services/convert.service";
-import {map, Observable, Subscription, tap} from "rxjs";
+import {BehaviorSubject, map, Observable, Subscription, tap} from "rxjs";
+import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 
-interface Item {
+interface ItemInterface {
   id: number,
   value: string
+}
+
+export class Item implements ItemInterface {
+  id: number;
+  value: string;
+
+  constructor(id: number, value: string) {
+    this.id = id;
+    this.value = value;
+  }
 }
 
 @Component({
@@ -13,72 +24,66 @@ interface Item {
   templateUrl: './parent.component.html',
   styleUrls: ['./parent.component.css']
 })
-export class ParentComponent implements OnInit, OnDestroy {
 
-  arrayStream$ = this.dataService.subject$;
-  subscription: Subscription = new Subscription;
+export class ParentComponent implements OnInit {
 
-  obj: Item = {"id": 0, "value": ''};
-  res: Array<Item> = [];
+  private _buttonsArraySubject = new BehaviorSubject<ItemInterface[]>([]);
 
-  constructor(private dataService: DataService, private convertService: ConvertService) {
-  }
+  private dataService = inject(DataService)
+  private convertService = inject(ConvertService)
 
-  ngOnInit(){
+  readonly buttonsArray$ = this._buttonsArraySubject.asObservable();
+  private destroyRef = inject(DestroyRef);
 
-    this.subscription = this.arrayStream$
+  ngOnInit() {
+
+    this.dataService.inputArray$
       .pipe(
-        tap(_ => console.log("stream el1", _)),
-        map(value => {
-          this.convertArrayToArrayOfObject(value);
-          return this.res
-        }),
+        tap(value => this.convertArrayToArrayOfObject(value)),
+        takeUntilDestroyed(this.destroyRef)
       )
       .subscribe(val => {
-        console.log("A", val)
       })
-
   }
 
-  ngOnDestroy() {
-    this.subscription.unsubscribe();
+  get buttonsArray() {
+    return this._buttonsArraySubject.value
   }
 
-  pushData(val: number) {
-    this.dataService.updateSubjectData = val;
-  }
-
-  convertArrayToArrayOfObject(arr: Array<number>) {
-    if (this.res.length === 0) {
-      for (let i = 0; i < arr.length; i++) {
-        this.obj = {"id": 0, "value": ''}
-        this.obj.id = arr[i];
-        this.obj.value = this.convertService.getRandomChar();
-        this.res.push(this.obj);
-      }
-    } else {
-      this.obj = {"id": 0, "value": ''}
-      this.obj.id = arr[arr.length - 1];
-      this.obj.value = this.convertService.getRandomChar();
-      this.res.push(this.obj);
+  convertArrayToArrayOfObject(inputArray: number[]) {
+    if (!inputArray?.length) {
+      return
     }
-  }
 
-  clickHandler(elValue: string) {
-    console.log(elValue);
-  }
+    const arr: ItemInterface[] = [];
 
-  addElement() {
-    if (this.res.length === 0) {
-      this.pushData(0);
-    } else {
-      this.pushData(this.res[this.res.length - 1].id + 1)
+    for (let btn of inputArray) {
+      const button: ItemInterface = new Item(btn, this.convertService.randomChar)
+      arr.push(button);
     }
+
+    this._buttonsArraySubject.next(arr);
   }
 
-  identify(i: number)  {
+  onButtonClick(button: ItemInterface) {
+    console.log(button);
+  }
+
+  onAddButtonClick() {
+
+    if (!this.buttonsArray?.length) {
+      const newButtonsArray = [...this.buttonsArray];
+      newButtonsArray.push(new Item(0, 'x'));
+      this._buttonsArraySubject.next(newButtonsArray);
+      return
+    }
+    const newButtonsArray = [...this.buttonsArray];
+    newButtonsArray.push(new Item(this.buttonsArray[this.buttonsArray.length - 1].id + 1, this.convertService.randomChar));
+    this._buttonsArraySubject.next(newButtonsArray);
+  }
+
+  identify(i: number) {
     return i;
   }
-
 
 }
