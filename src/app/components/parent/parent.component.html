@@ -1,7 +1,7 @@
 <!--<ng-container *ngIf="(inputArray$ | async) && (buttonsArray$ | async)">-->
 <div class="buttons">
   <div *ngFor="let button of buttonsArray$ | async as buttonArray; trackBy: identify" >
-    <code>{{buttonArray | json}}</code>
+<!--    <code>{{buttonArray | json}}</code>-->
     <button (click)="onButtonClick(button)">{{button.id}}</button>
   </div>
 </div>

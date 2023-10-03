@@ -3,6 +3,7 @@ import {DataService} from "../../services/data.service";
 import {ConvertService} from "../../services/convert.service";
 import {BehaviorSubject, map, Observable, Subscription, tap} from "rxjs";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
+import {inspect} from "@rxjs-insights/devtools";
 
 interface ItemInterface {
   id: number,
@@ -37,13 +38,16 @@ export class ParentComponent implements OnInit {
 
   ngOnInit() {
 
+
     this.inputArray$
       .pipe(
         tap(value => this.convertArrayToArrayOfObject(value)),
-        takeUntilDestroyed(this.destroyRef)
+        takeUntilDestroyed(this.destroyRef),
+        inspect
       )
       .subscribe(val => {
       })
+
   }
 
   get buttonsArray() {
